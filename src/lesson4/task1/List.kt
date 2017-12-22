@@ -258,7 +258,7 @@ fun convert(n: Int, base: Int): List<Int> {
     val list = mutableListOf<Int>()
     var tempN = n
     do {
-        list.add(0, newN % base)
+        list.add(0, tempN % base)
         tempN /= base
     } while (tempN != 0)
     return list
@@ -275,7 +275,7 @@ fun convert(n: Int, base: Int): List<Int> {
 fun convertToString(n: Int, base: Int): String {
     val keys = listOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z')
-    val tempN = convert(n, base).map { key[it] }
+    val tempN = convert(n, base).map { keys[it] }
     return tempN.joinToString("")
 }
 
