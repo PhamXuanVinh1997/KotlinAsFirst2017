@@ -1,5 +1,8 @@
 @file:Suppress("UNUSED_PARAMETER")
+
 package lesson5.task1
+
+import lesson1.task1.numberRevert
 
 /**
  * Пример
@@ -48,12 +51,10 @@ fun main(args: Array<String>) {
         val seconds = timeStrToSeconds(line)
         if (seconds == -1) {
             println("Введённая строка $line не соответствует формату ЧЧ:ММ:СС")
-        }
-        else {
+        } else {
             println("Прошло секунд с начала суток: $seconds")
         }
-    }
-    else {
+    } else {
         println("Достигнут <конец файла> в процессе чтения строки. Программа прервана")
     }
 }
@@ -66,7 +67,17 @@ fun main(args: Array<String>) {
  * День и месяц всегда представлять двумя цифрами, например: 03.04.2011.
  * При неверном формате входной строки вернуть пустую строку
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня",
+        "июля", "августа", "сентября", "октября", "ноября", "декабря")
+    val a = str.split(" ")
+    if (a.size != 3) return ""
+    return try {
+        if (a[0].length !in 1..2 || months.indexOf(a[1]) + 1 == 0 || a[2].toInt() < 0) ""
+        else twoDigitStr(a[0].toInt()) + "." + twoDigitStr(months.indexOf(a[1]) + 1) + "." + "${a[2].toInt()}"
+    }
+    catch (e: NumberFormatException) { "" }
+}
 
 /**
  * Средняя
@@ -75,7 +86,22 @@ fun dateStrToDigit(str: String): String = TODO()
  * Перевести её в строковый формат вида "15 июля 2016".
  * При неверном формате входной строки вернуть пустую строку
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня",
+        "июля", "августа", "сентября", "октября", "ноября", "декабря")
+    val p = digital.split(".")
+    if (p.size != 3) return ""
+    return try {
+        when {
+            (p[1].toInt() !in 1..12) -> ""
+            (p[0].length != 2 || p[1].length != 2) -> ""
+            else -> "${p[0].toInt()} ${months[p[1].toInt() - 1]} ${p[2].toInt()}"
+        }
+    }
+    catch (e: NumberFormatException) { "" }
+}
+
+
 
 /**
  * Средняя
@@ -89,7 +115,51 @@ fun dateDigitToStr(digital: String): String = TODO()
  * Все символы в номере, кроме цифр, пробелов и +-(), считать недопустимыми.
  * При неверном формате вернуть пустую строку
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String {
+    var l = phone.split("")
+    var l1:MutableList<String> = mutableListOf()
+    var sign = 1
+    for (i in 0..(l.size - 1)) {
+
+        when (l[i]) {
+            "0" -> l1.add(i, "0")
+            "1" -> l1.add(i, "1")
+            "2" -> l1.add(i, "2")
+            "3" -> l1.add(i, "3")
+            "4" -> l1.add(i, "4")
+            "5" -> l1.add(i, "5")
+            "6" -> l1.add(i, "6")
+            "7" -> l1.add(i, "7")
+            "8" -> l1.add(i, "8")
+            "9" -> l1.add(i, "9")
+            "" -> l1.add(i, "")
+            " " -> l1.add(i, " ")
+            "+" -> l1.add(i, "+")
+            "-" -> l1.add(i, "-")
+            "(" -> l1.add(i, "(")
+            ")" -> l1.add(i, ")")
+            else -> l1.add(i, "a")
+        }
+
+    }
+    var Out: String = ""
+
+    for (i in 0..(l1.size - 1)) {
+        if (l1[i] != "a") {
+            Out += l1[i]
+        } else sign = 0
+    }
+    var l2 = Out.split("+", "-", "(", ")", " ")
+    Out = ""
+    for (i in 0..(l2.size - 1)) {
+        Out += l2[i]
+    }
+    if (sign == 1) {
+        if (l[1] == "+") return "+" + Out
+        else
+            return Out
+    } else return ""
+}
 
 /**
  * Средняя
@@ -101,7 +171,11 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    val ListChar = "1234567890 -%"
+    for (i in jumps) if (i !in ListChar) return -1
+    return jumps.split(" ").filter { it != "-" && it != "%" && it != "" }.map { it.toInt() }.max() ?: -1
+}
 
 /**
  * Сложная
@@ -113,8 +187,19 @@ fun bestLongJump(jumps: String): Int = TODO()
  * Прочитать строку и вернуть максимальную взятую высоту (230 в примере).
  * При нарушении формата входной строки вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
-
+fun bestHighJump(jumps: String): Int {
+    val ListChar = "1234567890 -+%"
+    for (i in jumps) if (i !in ListChar) return -1
+    val a = jumps.split(" ").filter { it != "" }
+    var max = -1
+    if (a.size % 2 == 1 || a.isEmpty()) return -1
+    return try {
+        for (i in 0 until a.size step 2)
+            if (a[i].toInt() > max && a[i + 1].last() == '+') max = a[i].toInt()
+        max
+    }
+    catch (e: NumberFormatException) { -1 }
+}
 /**
  * Сложная
  *
@@ -135,7 +220,15 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    val p = str.toLowerCase().split(" ")
+    var index = 0
+    for (i in 1 until p.size) {
+        if (p[i] == p[i - 1]) return index
+        index += p[i - 1].length + 1
+    }
+    return -1
+}
 
 /**
  * Сложная
@@ -149,7 +242,6 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * Все цены должны быть положительными
  */
 fun mostExpensive(description: String): String = TODO()
-
 /**
  * Сложная
  *
@@ -161,7 +253,40 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    if (roman.isEmpty()) return -1
+    var l = roman.split("")
+    var l1 = mutableListOf<Int>()
+    for (i in 0 until l.size) {
+        l1.add(i, 0)
+        try {
+            when (l[i]) {
+                "I" -> l1[i] = 1
+                "V" -> l1[i] = 5
+                "X" -> l1[i] = 10
+                "L" -> l1[i] = 50
+                "C" -> l1[i] = 100
+                "D" -> l1[i] = 500
+                "M" -> l1[i] = 1000
+            }
+        } catch (e: IllegalArgumentException) {
+            return -1
+        }
+    }
+    var Sum = 0
+    l1.removeAt(0)
+    l1.removeAt(l.size - 2)
+    for (i in 0 until l1.size) {
+        if (l1[i] == 0) return -1
+       
+        if (i < (l1.size - 1) && l1[i] < l1[i + 1]) {
+                l1[i] = -l1[i]
+            } else l1[i] = l1[i]
+            Sum += l1[i]
+        }
+    
+    return Sum
+}
 
 /**
  * Очень сложная
@@ -199,4 +324,64 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    var newList = "><+-[] "
+    var kM = cells / 2
+    var kCommand = 0
+    var nObra = 0
+    for (char in commands) when {
+        char !in newList -> throw IllegalArgumentException()
+        nObra < 0 -> throw IllegalArgumentException()
+        char == '[' -> nObra++
+        char == ']' -> nObra--
+    }
+    if (nObra != 0) throw IllegalArgumentException()
+    var DeviceCell = MutableList(cells) { 0 }
+    if (commands.isEmpty()) return DeviceCell
+    try {
+        for (i in 1..limit) {
+            when (commands[kCommand]) {
+                '>' -> {
+                    kCommand++
+                    kM++
+                }
+                '<' -> {
+                    kCommand++
+                    kM--
+                }
+                '+' -> {
+                    DeviceCell[kM]++
+                    kCommand++
+                }
+                '-' -> {
+                    DeviceCell[kM]--
+                    kCommand++
+                }
+                '[' -> if (DeviceCell[kM] == 0) {
+                    nObra = 1
+                    kCommand++
+                    while (nObra != 0) {
+                        if (commands[kCommand] == '[') nObra++
+                        if (commands[kCommand] == ']') nObra--
+                        kCommand++
+                    }
+                } else kCommand++
+                ']' -> if (DeviceCell[kM] != 0) {
+                    nObra = -1
+                    kCommand++
+                    while (nObra != 0) {
+                        if (commands[kCommand - 2] == '[') nObra++
+                        if (commands[kCommand - 2] == ']') nObra--
+                        kCommand--
+                    }
+                } else kCommand++
+                ' ' -> kCommand++
+            }
+            if (kM !in 0 until cells) throw IllegalStateException()
+            if (kCommand == commands.length) break
+        }
+        return DeviceCell
+    } catch (e: IndexOutOfBoundsException) {
+        throw IllegalArgumentException()
+    }
+}
